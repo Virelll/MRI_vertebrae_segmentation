@@ -4,25 +4,18 @@ class UNet(nn.Module):
     def __init__(self, num_classes):
         super(UNet, self).__init__()
         self.max_pool2d = nn.MaxPool2d(kernel_size=2, stride=2)
-        # Contracting path.
-        # Each convolution is applied twice.
         self.down_convolution_1 = double_convolution(1, 64)
         self.down_convolution_2 = double_convolution(64, 128)
         self.down_convolution_3 = double_convolution(128, 256)
         self.down_convolution_4 = double_convolution(256, 512)
         self.down_convolution_5 = double_convolution(512, 1024)
-        #         self.down_convolution_5 = double_convolution(512, 512)
         self.dropout = nn.Dropout(0.5)
 
-        # Expanding path.
         self.up_transpose_1 = nn.ConvTranspose2d(
-            #             in_channels=512, out_channels=512,
             in_channels=1024, out_channels=512,
             kernel_size=2,
             stride=2)
-        # Below, `in_channels` again becomes 1024 as we are concatinating.
         self.up_convolution_1 = double_convolution(1024, 512)
-        #         self.up_convolution_1 = double_convolution(512, 512)
         self.up_transpose_2 = nn.ConvTranspose2d(
             in_channels=512, out_channels=256,
             kernel_size=2,
@@ -38,14 +31,12 @@ class UNet(nn.Module):
             kernel_size=2,
             stride=2)
         self.up_convolution_4 = double_convolution(128, 64)
-        # output => `out_channels` as per the number of classes.
         self.out = nn.Conv2d(
             in_channels=64, out_channels=num_classes,
             kernel_size=1
         )
 
     def forward(self, x):
-        # TODO: Write here!
         down_1 = self.down_convolution_1(x)
         down_2 = self.max_pool2d(down_1)
         down_3 = self.down_convolution_2(down_2)
